@@ -6,7 +6,3 @@ private:
 public:
   long long get();
 };
-
-long long Counter::get() {
-  return cnt++;
-}
