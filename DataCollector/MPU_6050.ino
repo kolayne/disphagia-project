@@ -13,8 +13,14 @@ MPU6050::MPU6050() {
   mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
 }
 
-Triple<sensors_vec_t, sensors_vec_t, float> MPU6050::get_acc_gyro_temp() {
-  sensors_event_t acc, gyro, temp;
-  mpu.getEvent(&acc, &gyro, &temp);
-  return {acc.acceleration, gyro.gyro, temp.temperature};
+Triple<sensors_vec_t, sensors_vec_t, float> MPU6050::get_acc_gyro_tempr() {
+  sensors_event_t acc, gyro, tempr;
+  mpu.getEvent(&acc, &gyro, &tempr);
+  return {acc.acceleration, gyro.gyro, tempr.temperature};
+}
+
+String MPU6050::get_acc_tempr_as_json() {
+  Triple<sensors_vec_t, sensors_vec_t, float> acc_gyro_tempr = this->get_acc_gyro_tempr();
+  return String("{\"acc\":{\"x\":")+String(acc_gyro_tempr.x.x)+String(",\"y\":")+String(acc_gyro_tempr.x.y)+
+    String(",\"z\":")+String(acc_gyro_tempr.x.z)+String("}, \"tempr\": ")+String(acc_gyro_tempr.z)+String("}");
 }

@@ -10,5 +10,6 @@ private:
 public:
   MPU6050();
 
-  Triple<sensors_vec_t, sensors_vec_t, float> get_acc_gyro_temp();
+  Triple<sensors_vec_t, sensors_vec_t, float> get_acc_gyro_tempr();
+  String get_acc_tempr_as_json();
 };

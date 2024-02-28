@@ -6,7 +6,7 @@
 #define W_PWD "BEE40B263E03"
 #define SERVER_IP "192.168.88.148"
 #define SERVER_PORT 5000
-#define DELAY 1000
+#define DELAY_MS 1000
 #define TCP_RETRY_DELAY_MS 1000
 #define TCP_REPLY_RETRIES 5
 
@@ -53,14 +53,13 @@ void setup() {
 }
 
 void loop() {
-  static Counter sensor1{};
+  static Counter cnt{};
   static MPU6050 mpu6050;
 
-  sendMeasurement(String("{\"val\":") + String(sensor1.get()) + String("}"));
-  auto acc_gyro_temp = mpu6050.get_acc_gyro_temp();
-  sendMeasurement(
-    String("{\"acc\":{\"x\":")+String(acc_gyro_temp.x.x)+String(",\"y\":")+String(acc_gyro_temp.x.y)+
-    String(",\"z\":")+String(acc_gyro_temp.x.z)+String("}, \"temp\": ")+String(acc_gyro_temp.z)+String("}"));
+  String cnt_json = cnt.get_as_json();
+  String mpu6050_json = mpu6050.get_acc_tempr_as_json();
 
-  delay(DELAY);
+  sendMeasurement(String("{\"cnt\":") + cnt_json + String(", \"env\":") + mpu6050_json + String("}"));
+
+  delay(DELAY_MS);
 }
