@@ -23,7 +23,7 @@ void sendMeasurement(const String &json) {
     return;
   }
 
-  client.printf("POST /measure/" /*"%s"*/ SENSING_DEVICE_ID " HTTP/1.0\n"
+  client.printf("POST /measures/" /*"%s"*/ SENSING_DEVICE_ID " HTTP/1.0\n"
                 "Connection: close\nContent-type: application/json\n"
                 "Content-Length: %d\n\n"
                 "%s",
