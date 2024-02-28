@@ -10,18 +10,18 @@ def index():
 
 measurements = {}
 
-@app.route('/measure/<measurement>', methods=['POST'])
-def sensor(measurement: str):
-    measurements[measurement] = request.get_json()
+@app.route('/measure/<sensing_device>', methods=['POST'])
+def sensor(sensing_device: str):
+    measurements[sensing_device] = request.get_json()
     return ''
 
 @app.route('/last/')
 def last_list():
     return '/' + '<br>/'.join(measurements.keys())
 
-@app.route('/last/<measurement>')
-def last(measurement: str):
-    return measurements.get(measurement, '<no data for this measurement yet>')
+@app.route('/last/<sensing_device>')
+def last(sensing_device: str):
+    return measurements.get(sensing_device, '<no data for this measurement yet>')
 
 
 if __name__ == '__main__':
