@@ -52,12 +52,20 @@ void setup() {
   connectToWiFiSync(W_SSID, W_PWD);
 }
 
+//#define FAKE_SENSORS
+
 void loop() {
   static Counter cnt{};
+#ifndef FAKE_SENSORS
   static MPU6050 mpu6050;
+#endif // !FAKE_SENSORS
 
   String cnt_json = cnt.get_as_json();
+#ifdef FAKE_SENSORS
+  String mpu6050_json = String("{\"acc\": {\"x\": 1.23, \"y\": 4.56, \"z\": 7.89}, \"temp\": -1.0}");
+#else
   String mpu6050_json = mpu6050.get_acc_tempr_as_json();
+#endif // FAKE_SENSORS
 
   sendMeasurement(String("{\"cnt\":") + cnt_json + String(", \"env\":") + mpu6050_json + String("}"));
 
