@@ -1,5 +1,4 @@
 #include <WiFi.h>
-#include "dummy_counter.h"
 #include "MPU_6050.h"
 #include "Piezo.h"
 
@@ -58,13 +57,11 @@ void setup() {
 //#define FAKE_SENSORS
 
 void loop() {
-  static Counter cnt{};
 #ifndef FAKE_SENSORS
   static MPU6050 mpu6050;
   static PiezoElectricSensor piezo{PIEZO_PIN};
 #endif // !FAKE_SENSORS
 
-  String cnt_json = cnt.get_as_json();
 #ifdef FAKE_SENSORS
   String mpu6050_json = String("{\"acc\": {\"x\": 1.23, \"y\": 4.56, \"z\": 7.89}, \"temp\": -1.0}");
   String piezo_json = String("{\"analog\": 123}");
@@ -73,8 +70,10 @@ void loop() {
   String piezo_json = piezo.get_json();
 #endif // FAKE_SENSORS
 
-  sendMeasurement(String("{\"cnt\":") + cnt_json + String(",\"env\":") + mpu6050_json +
-                  String(",\"piezo\":") + piezo_json + String("}"));
+  sendMeasurement(String("{\"millis\":") + String(millis()) +
+                  String(",\"env\":") + mpu6050_json +
+                  String(",\"piezo\":") + piezo_json +
+                  String("}"));
 
   delay(DELAY_MS);
 }
