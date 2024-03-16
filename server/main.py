@@ -1,15 +1,17 @@
 from io import BytesIO
 from datetime import datetime
+from typing import Optional
 
-from flask import Flask, request, abort, send_file
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import StreamingResponse
 
 from dict_stream import flatten_dict, extend_dicts_keys
 
 
-app = Flask(__name__)
+app = FastAPI()
 
 
-@app.route('/')
+@app.get('/')
 def index():
     return 'Nothing here'
 
@@ -17,35 +19,32 @@ def index():
 measurements = {}
 
 
-@app.route('/measures/<sensing_device>', methods=['POST', 'DELETE'])
-def sensor(sensing_device: str):
-    if request.method == 'DELETE':
-        if sensing_device in measurements.keys():
-            del measurements[sensing_device]
-        else:
-            abort(404, 'Unknown sensing device name, nothing to delete')
-    elif request.method == 'POST':
-        # Add the value to previous measurements
-        measurements[sensing_device] = measurements.get(sensing_device, []) + [request.get_json()]
+@app.post('/measures')
+async def post_measures(device: str, request: Request):
+    measurements[device] = measurements.get(device, []) + [await request.json()]
+    return {}
 
-    return ''
+@app.delete('/measures')
+async def delete_measures(device: str):
+    if device not in measurements.keys():
+        raise HTTPException(status_code=404, detail='Unknown device, nothing to delete')
+    del measurements[device]
+    return {}
 
-@app.route('/last/')
-def last_list():
-    return '/' + '<br>/'.join(measurements.keys())
+@app.get('/last')
+async def get_last(device: Optional[str] = None):
+    if device is None:
+        return {'keys': list(measurements.keys())}
+    return measurements.get(device, [{'error': '<no data for this device yet>'}])[-1]
 
-@app.route('/last/<sensing_device>')
-def last(sensing_device: str):
-    return measurements.get(sensing_device, ['<no data for this measurement yet>'])[-1]
-
-@app.route('/export/<sensing_device>')
-def export(sensing_device: str):
+@app.get('/export')
+async def get_export(device: str):
     sep = ';'
 
-    if not measurements.get(sensing_device):
-        abort(404, 'No measurements present for the requested sensing device')
+    if not measurements.get(device):
+        raise HTTPException(status_code=404, detail="No measurements for the requested device")
 
-    flattened = map(lambda m: dict(flatten_dict(m)), measurements[sensing_device])
+    flattened = map(lambda m: dict(flatten_dict(m)), measurements[device])
     extended = list(extend_dicts_keys(flattened, placeholder_value=''))
 
     export = ''
@@ -58,9 +57,12 @@ def export(sensing_device: str):
     csvbin = BytesIO()
     csvbin.write(export.encode('utf-8'))
     csvbin.seek(0)
-    return send_file(csvbin, mimetype='text/csv',
-                     download_name=f'{sensing_device} {datetime.now():%Y-%m-%d %H-%M-%S}.csv')
+    device = device.replace('"', '')  # Avoid invalid response below
+    return StreamingResponse(csvbin, media_type='text/csv',
+                             headers={'Content-Disposition':
+                                 f'inline; filename="{device} {datetime.now():%Y-%m-%d %H-%M-%S}.csv"'})
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 5000)
+    print("The suggested run method is: uvicorn main:app --host 0.0.0.0")
+    exit(1)
