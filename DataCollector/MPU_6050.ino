@@ -8,7 +8,7 @@ MPU6050::MPU6050() {
     delay(1000);
   }
 
-  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
 }
@@ -16,6 +16,14 @@ MPU6050::MPU6050() {
 Triple<sensors_vec_t, sensors_vec_t, float> MPU6050::get_acc_gyro_tempr() {
   sensors_event_t acc, gyro, tempr;
   mpu.getEvent(&acc, &gyro, &tempr);
+
+  // Calibration
+#warning Calibration values for MPU6050 are hardcoded in MPU_6050.ino. Do they match your sensor?
+#warning Gyroscope and temperature values are not calibrated
+  acc.acceleration.x -= 0.487;
+  acc.acceleration.y += 0.091;
+  acc.acceleration.z -= 0.017;
+
   return {acc.acceleration, gyro.gyro, tempr.temperature};
 }
 
