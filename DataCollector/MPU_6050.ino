@@ -20,9 +20,9 @@ Triple<sensors_vec_t, sensors_vec_t, float> MPU6050::get_acc_gyro_tempr() {
   // Calibration
 #warning Calibration values for MPU6050 are hardcoded in MPU_6050.ino. Do they match your sensor?
 #warning Gyroscope and temperature values are not calibrated
-  acc.acceleration.x -= 0.487;
-  acc.acceleration.y += 0.091;
-  acc.acceleration.z -= 0.017;
+  acc.acceleration.x -= 0.029;
+  acc.acceleration.y += 0.048;
+  acc.acceleration.z -= 0.067;
 
   return {acc.acceleration, gyro.gyro, tempr.temperature};
 }
