@@ -27,7 +27,7 @@
  ****************************************/
 
 struct Measure {
-  float eeg_raw;
+  float ecg_raw;
   Triple<float, float, float> acc;
   float tempr;
   int dummy;
@@ -53,7 +53,7 @@ void doMeasures() {
   for (size_t i = 0; i < N_MEASURES; ++i) {
     Triple<Triple<float, float, float>, Triple<float, float, float>, float> acc_gyro_tempr = mpu_sensor.get_acc_gyro_tempr();
 
-    measures[i].eeg_raw = analogRead(SENSOR);
+    measures[i].ecg_raw = analogRead(SENSOR);
     measures[i].acc = acc_gyro_tempr.x;
     measures[i].tempr = acc_gyro_tempr.z;
     // Read values from other sensors here
