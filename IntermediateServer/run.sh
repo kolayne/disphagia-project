@@ -11,4 +11,5 @@ if ! ping -c 1 "$hostname" > /dev/null ; then
   exit 1
 fi
 
-exec ncat -k -l 2500 -c "( curl -X POST http://"$ADDR" -F bin=@- && echo curled || echo not curled ) >&2"
+# My raspberry is running curl version 7.*, which doesn't yet support `--fail-with-body`
+exec ncat -k -l 2500 -c "( curl -X POST http://"$ADDR" -F bin=@- -w 'Sent. Response status: %{response_code}\n' ) >&2"
